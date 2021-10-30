@@ -1,0 +1,28 @@
+prefix: "&d&lPaladin &r&7» &r"
+
+sender:
+  freeze: "&d{target} &7has been &bfrozen&7!"
+  not_frozen: "&d{target} &7iz &cnot &bfrozen&7!"
+  already_frozen: "&d{target} &7iz &calready &bfrozen&7!"
+  cannot_freeze_self: "&dYou &7cant freeze yourself!"
+  thaw: "&d{target} &7has been &athawd&7!"
+
+target:
+  freeze:
+    - ""
+    - "&7&lU &r&7has been &c&lfrozen &r&7by an &cadministrator&7"
+    - "&cDisconnectin &7will cause u 2 be &4bannd&7"
+    - "&7Click below 2 open ur &2wan-tiem anticheat skan&7!"
+    - "&7&n{link}"
+  thaw: "&dU &7has been &bthawd&7!"
+
+autothaw:
+  admin: "&d{target} &7has been automatically &bthawd&7!"
+  target: "&dU &7has been automatically &bthawd&7!"
+
+scan:
+  started: "&d{target} &7has &estartd &7scannin"
+  complete:
+    - "&d{target} &7has &2completd&7 scannin"
+    - "&d&nClick her&7 2 review teh results ov &d{target}"
+  abort: "&d{target} &7has &4abortd&7 their skan!"

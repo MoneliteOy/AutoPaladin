@@ -1,0 +1,9 @@
+main: ac.paladin.auto.PaladinPlugin
+api-version: "1.13"
+
+load: STARTUP
+
+name: AutoPaladin
+version: @VERSION@
+authors: [Mexican, Lillian Armes, Syn, Marshall Walker]
+website: https://paladin.ac/

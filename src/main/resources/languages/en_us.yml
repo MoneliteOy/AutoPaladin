@@ -1,0 +1,28 @@
+prefix: "&5&lPaladin &r&7» &r"
+
+sender:
+  freeze: "&d{target} &7has been &bfrozen&7!"
+  not_frozen: "&d{target} &7is &cnot &bfrozen&7!"
+  already_frozen: "&d{target} &7is &calready &bfrozen&7!"
+  cannot_freeze_self: "&dYou &7cannot freeze yourself!"
+  thaw: "&d{target} &7has been &athawed&7!"
+
+target:
+  freeze:
+    - ""
+    - "&7&lYou &r&7have been &c&lfrozen &r&7by an &cadministrator&7"
+    - "&cDisconnecting &7will cause you to be &4banned&7"
+    - "&dClick below &7to open your &2one-time anticheat scan&7!"
+    - "&d&n{link}"
+  thaw: "&dYou &7have been &bthawed&7!"
+
+autothaw:
+  admin: "&d{target} &7has been automatically &bthawed&7!"
+  target: "&dYou &7have been automatically &bthawed&7!"
+
+scan:
+  started: "&d{target} &7has &estarted &7scanning"
+  complete:
+    - "&d{target} &7has &2completed&7 scanning"
+    - "&d&nClick here&7 to review the results of &d{target}"
+  abort: "&d{target} &7has &4aborted&7 their scan!"
