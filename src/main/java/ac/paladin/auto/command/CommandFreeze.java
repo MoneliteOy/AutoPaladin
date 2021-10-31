@@ -55,6 +55,8 @@ public final class CommandFreeze extends BaseCommand {
         target.setGameMode(GameMode.ADVENTURE);
         target.setAllowFlight(false);
         target.setFlying(false);
+        target.getInventory().clear();
+        target.getInventory().setArmorContents(null);
 
         i_messageRegistry.sendMessage(sender, "sender.freeze", args -> args.setArgument("target", target.getName()));
 
