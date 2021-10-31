@@ -3,5 +3,5 @@
   "language": "en_us",
   "ban_command_on_logout": "ban {target} Logged out whilst frozen.",
   "disable_commands_when_frozen": true,
-  "clear_inventory_when_frozen": true
+  "clear_inventory_when_frozen": false
 }
