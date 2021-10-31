@@ -59,7 +59,9 @@ Automated scanning is essential to saving time for everyone, this plugin helps a
 - Prevented from dealing & receiving attacks
 - Temporarily set to adventure gamemode
 - Temporarily given full hunger
-- Prevented from sending commands
+- Temporarily cleared of their items (disabled by default)
+    - Configurable via `/plugins/AutoPaladin/config.json`
+- Prevented from sending commands (enabled by default)
     - Configurable via `/plugins/AutoPaladin/config.json`
 
 ## <b>Building</b>

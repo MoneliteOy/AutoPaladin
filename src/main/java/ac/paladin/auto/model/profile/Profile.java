@@ -15,6 +15,7 @@ import lombok.experimental.Accessors;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.UUID;
@@ -45,12 +46,18 @@ public final class Profile implements IProfile {
 
     private BukkitRunnable m_messageTask;
 
+    private ItemStack[] m_armorContents;
+
+    private ItemStack[] m_inventoryContents;
+
     @Override
     public void store(Player player) {
         this.m_gameMode = player.getGameMode();
         this.m_allowFlight = player.getAllowFlight();
         this.m_flying = player.isFlying();
         this.m_foodLevel = player.getFoodLevel();
+        this.m_armorContents = player.getInventory().getArmorContents();
+        this.m_inventoryContents = player.getInventory().getContents();
     }
 
     @Override
@@ -66,6 +73,9 @@ public final class Profile implements IProfile {
         player.setAllowFlight(m_allowFlight);
         player.setFlying(m_flying);
         player.setFoodLevel(m_foodLevel);
+
+        player.getInventory().setContents(m_inventoryContents);
+        player.getInventory().setArmorContents(m_armorContents);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package ac.paladin.auto.command;
 
 import ac.paladin.auto.PaladinPlugin;
+import ac.paladin.auto.config.PluginConfig;
 import ac.paladin.auto.event.PlayerFreezeEvent;
 import ac.paladin.auto.manager.IScanManager;
 import ac.paladin.auto.model.profile.Profile;
@@ -29,6 +30,9 @@ public final class CommandFreeze extends BaseCommand {
     @Dependency
     private IScanManager i_scanManager;
 
+    @Dependency
+    private PluginConfig i_pluginConfig;
+
     @Default
     @CommandCompletion("@players")
     @Syntax("<target>")
@@ -55,6 +59,10 @@ public final class CommandFreeze extends BaseCommand {
         target.setGameMode(GameMode.ADVENTURE);
         target.setAllowFlight(false);
         target.setFlying(false);
+        if (i_pluginConfig.isClearInventoryWhenFrozen()) {
+            target.getInventory().clear();
+            target.getInventory().setArmorContents(null);
+        }
 
         i_messageRegistry.sendMessage(sender, "sender.freeze", args -> args.setArgument("target", target.getName()));
 
