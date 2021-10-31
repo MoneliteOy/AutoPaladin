@@ -60,6 +60,7 @@ Automated scanning is essential to saving time for everyone, this plugin helps a
 - Temporarily set to adventure gamemode
 - Temporarily given full hunger
 - Temporarily cleared of their items
+    - Configurable via `/plugins/AutoPaladin/config.json`
 - Prevented from sending commands
     - Configurable via `/plugins/AutoPaladin/config.json`
 

@@ -73,6 +73,7 @@ public final class Profile implements IProfile {
         player.setAllowFlight(m_allowFlight);
         player.setFlying(m_flying);
         player.setFoodLevel(m_foodLevel);
+
         player.getInventory().setContents(m_inventoryContents);
         player.getInventory().setArmorContents(m_armorContents);
     }

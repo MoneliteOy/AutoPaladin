@@ -19,4 +19,7 @@ public final class PluginConfig {
 
     @JsonProperty("disable_commands_when_frozen")
     private boolean m_disableCommandsWhenFrozen;
+
+    @JsonProperty("clear_inventory_when_frozen")
+    private boolean m_clearInventoryWhenFrozen;
 }

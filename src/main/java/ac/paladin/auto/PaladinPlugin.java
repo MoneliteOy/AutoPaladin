@@ -129,6 +129,7 @@ public final class PaladinPlugin extends JavaPlugin {
         m_commandManager.registerDependency(IProfileRegistry.class, m_profileRegistry);
         m_commandManager.registerDependency(IPaladinService.class, m_paladinService);
         m_commandManager.registerDependency(IScanManager.class, m_scanManager);
+        m_commandManager.registerDependency(PluginConfig.class, m_pluginConfig);
     }
 
     private void registerCommands() {
