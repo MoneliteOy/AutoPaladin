@@ -45,7 +45,7 @@ Automated scanning is essential to saving time for everyone, this plugin helps a
         - real-time chat & XP level progress updates
         - provides scan results link after completion
         - autothaws user 5 minutes after scan completion
-    - /thaw (username) or /unfreeze (username)
+    - /thaw (username) or /unfreeze (username) or /melt (username)
         - restores the user to original state
 - paladin.auto.reload
     - /paladin reload
@@ -57,6 +57,7 @@ Automated scanning is essential to saving time for everyone, this plugin helps a
 - Prevented from breaking & placing
 - Prevented from dropping & picking up
 - Prevented from dealing & receiving attacks
+- Prevented from interacting with all items
 - Temporarily set to adventure gamemode
 - Temporarily given full hunger
 - Temporarily cleared of their items (disabled by default)

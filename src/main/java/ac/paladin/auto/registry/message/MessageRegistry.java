@@ -10,30 +10,31 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 @RequiredArgsConstructor
 public final class MessageRegistry implements IMessageRegistry {
 
-    private static final String[] s_languages = {
-            "en_us",
-            "lol_aa"
-    };
-
     private final Plugin i_plugin;
 
     private final PluginConfig i_pluginConfig;
 
-    private final Map<String, YamlConfiguration> m_messages = new HashMap<>();
+    // language -> (key -> message)
+    private final Map<String, Map<String, String[]>> m_messages = new HashMap<>();
 
     @Override
     public void load() {
@@ -43,21 +44,8 @@ public final class MessageRegistry implements IMessageRegistry {
         m_messages.clear();
 
         try {
-            Files.createDirectories(languages.toPath());
-
-            // Copy default locales
-            for (String language : s_languages) {
-                File languageFile = new File(languages, language + ".yml");
-                if (languageFile.exists()) {
-                    continue;
-                }
-
-                InputStream stream = i_plugin.getResource("languages/" + language + ".yml");
-                assert stream != null;
-
-                Files.copy(stream, languageFile.toPath());
-                stream.close();
-            }
+            i_plugin.saveResource("languages/en_us.yml", false);
+            i_plugin.saveResource("languages/lol_aa.yml", false);
 
             // Get all yml files in the languages path
             File[] ymlFiles = languages.listFiles((dir, name) -> name.endsWith(".yml"));
@@ -83,7 +71,7 @@ public final class MessageRegistry implements IMessageRegistry {
                     configuration.loadFromString(content.toString());
 
                     String fileName = languageFile.getName();
-                    m_messages.put(fileName.substring(0, fileName.indexOf(".")), configuration);
+                    m_messages.put(fileName.substring(0, fileName.indexOf(".")), loadMessages(configuration));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -91,6 +79,20 @@ public final class MessageRegistry implements IMessageRegistry {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private Map<String, String[]> loadMessages(ConfigurationSection section) {
+        Map<String, String[]> map = new HashMap<>();
+        for (String key : section.getKeys(true)) {
+            if (section.isConfigurationSection(key)) {
+                map.putAll(loadMessages(Objects.requireNonNull(section.getConfigurationSection(key))));
+            } else if (section.isString(key)) {
+                map.put(key, new String[]{section.getString(key)});
+            } else if (section.isList(key)) {
+                map.put(key, section.getStringList(key).toArray(new String[0]));
+            }
+        }
+        return map;
     }
 
     private String getLang(CommandSender sender) {
@@ -101,59 +103,52 @@ public final class MessageRegistry implements IMessageRegistry {
         return i_pluginConfig.getLanguage();
     }
 
-    private List<String> getMessagesAndReplace(CommandSender receiver, String key, Consumer<IMessageArguments> args) {
+    private String[] getMessagesAndReplace(CommandSender receiver, String key, Consumer<IMessageArguments> args) {
         MessageArguments arguments = new MessageArguments();
         args.accept(arguments);
 
-        List<String> messages = getMessages(key, getLang(receiver));
+        String[] messages = getMessages(key, getLang(receiver));
         replaceArguments(messages, arguments);
 
         return messages;
     }
 
     @Override
-    public List<String> getMessages(String key, String lang) {
-        YamlConfiguration config = m_messages.get(lang);
-        if (config == null) {
+    public String[] getMessages(String key, String lang) {
+        Map<String, String[]> map = m_messages.get(lang);
+        if (map == null) {
             // Get default server language
-            config = m_messages.get(i_pluginConfig.getLanguage());
+            map = m_messages.get(i_pluginConfig.getLanguage());
         }
 
-        if (config.isString(key)) {
-            // Make a new arraylist here because if we used a singleton list we would have to copy it regardless
-            List<String> list = new ArrayList<>();
-            list.add(config.getString("prefix") + config.getString(key));
-            return list;
-        } else if (config.isList(key)) {
-            List<String> messages = config.getStringList(key);
-            for (int i = 0; i < messages.size(); i++) {
-                messages.set(i, config.get("prefix") + messages.get(i));
-            }
-
-            return messages;
+        String[] messages = map.getOrDefault(key, new String[]{String.format("key.not.found (%s)", key)}).clone();
+        for (int i = 0; i < messages.length; i++) {
+            messages[i] = map.get("prefix")[0] + messages[i];
         }
 
-        return Collections.singletonList(String.format("key.not.found (%s)", key));
+        return messages;
     }
 
     @Override
-    public void replaceArguments(List<String> strings, MessageArguments arguments) {
+    public String[] replaceArguments(String[] strings, MessageArguments arguments) {
         for (Entry<String, Object> entry : arguments.getArguments().entrySet()) {
-            for (int i = 0; i < strings.size(); i++) {
-                String message = strings.get(i);
+            for (int i = 0; i < strings.length; i++) {
+                String message = strings[i];
 
                 // Replace placeholders
                 message = message.replaceAll(String.format("\\{%s\\}", entry.getKey()), entry.getValue().toString());
                 message = ChatColor.translateAlternateColorCodes('&', message);
 
-                strings.set(i, message);
+                strings[i] = message;
             }
         }
+
+        return strings;
     }
 
     @Override
     public void sendMessage(Player receiver, String key) {
-        List<String> messages = getMessages(key, getLang(receiver));
+        String[] messages = getMessages(key, getLang(receiver));
         for (String message : messages) {
             receiver.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
         }
@@ -161,7 +156,7 @@ public final class MessageRegistry implements IMessageRegistry {
 
     @Override
     public void sendMessage(Player receiver, String key, Consumer<IMessageArguments> args) {
-        List<String> messages = getMessagesAndReplace(receiver, key, args);
+        String[] messages = getMessagesAndReplace(receiver, key, args);
         for (String message : messages) {
             receiver.sendMessage(message);
         }
@@ -169,7 +164,7 @@ public final class MessageRegistry implements IMessageRegistry {
 
     @Override
     public void sendMessage(Player receiver, String key, Consumer<IMessageArguments> args, String clickUrl) {
-        List<String> messages = getMessagesAndReplace(receiver, key, args);
+        String[] messages = getMessagesAndReplace(receiver, key, args);
 
         for (String message : messages) {
             BaseComponent[] components = TextComponent.fromLegacyText(message);

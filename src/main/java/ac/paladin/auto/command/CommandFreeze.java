@@ -70,7 +70,7 @@ public final class CommandFreeze extends BaseCommand {
 
         i_scanManager.createScan(sender, target, scan -> {
             FrozenMessageTask task = new FrozenMessageTask(i_messageRegistry, profile, target, sender, scan);
-            task.runTaskTimerAsynchronously(i_plugin, 10, 200);
+            task.runTaskTimerAsynchronously(i_plugin, 0, 200);
 
             profile.setMessageTask(task);
 

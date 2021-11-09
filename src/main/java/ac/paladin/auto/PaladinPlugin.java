@@ -5,10 +5,7 @@ import ac.paladin.auto.command.CommandReload;
 import ac.paladin.auto.command.CommandThaw;
 import ac.paladin.auto.config.PluginConfig;
 import ac.paladin.auto.factory.profile.ProfileFactory;
-import ac.paladin.auto.listener.BlockListener;
-import ac.paladin.auto.listener.LegacyPickupListener;
-import ac.paladin.auto.listener.PickupListener;
-import ac.paladin.auto.listener.PlayerListener;
+import ac.paladin.auto.listener.*;
 import ac.paladin.auto.manager.IScanManager;
 import ac.paladin.auto.manager.ScanManager;
 import ac.paladin.auto.model.profile.IProfile;
@@ -60,10 +57,6 @@ public final class PaladinPlugin extends JavaPlugin {
     public void onEnable() {
         registerObjectMapper();
         loadPluginConfig();
-        if (m_pluginConfig.getApiKey().isEmpty()) {
-            throw new RuntimeException("No API key set");
-        }
-
         registerMessages();
         registerProfiles();
         registerHttpClient();
@@ -109,7 +102,16 @@ public final class PaladinPlugin extends JavaPlugin {
         File configFile = new File(getDataFolder(), "config.json");
 
         try {
-            this.m_pluginConfig = m_objectMapper.readValue(configFile, PluginConfig.class);
+            PluginConfig config = m_objectMapper.readValue(configFile, PluginConfig.class);
+            if (this.m_pluginConfig == null) {
+                this.m_pluginConfig = config;
+            } else {
+                this.m_pluginConfig.setApiKey(config.getApiKey());
+                this.m_pluginConfig.setLanguage(config.getLanguage());
+                this.m_pluginConfig.setBanCommandOnLogout(config.getBanCommandOnLogout());
+                this.m_pluginConfig.setDisableCommandsWhenFrozen(config.isDisableCommandsWhenFrozen());
+                this.m_pluginConfig.setClearInventoryWhenFrozen(config.isClearInventoryWhenFrozen());
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -162,12 +164,13 @@ public final class PaladinPlugin extends JavaPlugin {
         }
 
         pluginManager.registerEvents(new BlockListener(m_profileRegistry), this);
+        pluginManager.registerEvents(new InteractListener(m_profileRegistry), this);
     }
 
     private void registerHttpClient() {
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
         builder.pingInterval(30, TimeUnit.SECONDS);
-        builder.addInterceptor(new AuthorizationInterceptor(m_pluginConfig.getApiKey()));
+        builder.addInterceptor(new AuthorizationInterceptor(m_pluginConfig));
         this.m_httpClient = builder.build();
     }
 
@@ -183,7 +186,7 @@ public final class PaladinPlugin extends JavaPlugin {
 
     private void registerScanManager() {
         PluginManager pluginManager = getServer().getPluginManager();
-        ScanManager scanManager = new ScanManager(m_objectMapper, m_paladinService, m_httpClient, pluginManager);
+        ScanManager scanManager = new ScanManager(m_objectMapper, m_paladinService, m_httpClient, pluginManager, m_pluginConfig);
         scanManager.connect();
         this.m_scanManager = scanManager;
     }

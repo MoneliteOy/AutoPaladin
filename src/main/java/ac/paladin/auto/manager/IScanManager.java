@@ -10,6 +10,8 @@ public interface IScanManager extends IDisposable {
 
     void connect();
 
+    boolean isConnected();
+
     /**
      * Create a new scan for the target player.
      *

@@ -22,7 +22,7 @@ public interface IMessageRegistry extends IDisposable {
      * @param lang The language
      * @return The messages
      */
-    List<String> getMessages(String key, String lang);
+    String[] getMessages(String key, String lang);
 
     /**
      * Replaces arguments in provided strings
@@ -30,7 +30,7 @@ public interface IMessageRegistry extends IDisposable {
      * @param strings   The strings
      * @param arguments The args
      */
-    void replaceArguments(List<String> strings, MessageArguments arguments);
+    String[] replaceArguments(String[] strings, MessageArguments arguments);
 
     /**
      * Sends a message associated with the key

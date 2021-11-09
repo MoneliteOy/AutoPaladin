@@ -2,9 +2,11 @@ package ac.paladin.auto.config;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.Accessors;
 
 @Getter
+@Setter
 @Accessors(prefix = "m_")
 public final class PluginConfig {
 

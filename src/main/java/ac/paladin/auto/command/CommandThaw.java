@@ -10,7 +10,7 @@ import co.aikar.commands.annotation.*;
 import co.aikar.commands.bukkit.contexts.OnlinePlayer;
 import org.bukkit.entity.Player;
 
-@CommandAlias("thaw|unfreeze")
+@CommandAlias("thaw|unfreeze|melt")
 @CommandPermission("paladin.auto.freeze")
 public final class CommandThaw extends BaseCommand {
 

@@ -1,5 +1,6 @@
 package ac.paladin.auto.manager;
 
+import ac.paladin.auto.config.PluginConfig;
 import ac.paladin.auto.event.PlayerAbortScanEvent;
 import ac.paladin.auto.model.http.StartScanRequest;
 import ac.paladin.auto.model.http.StartScanResponse;
@@ -35,19 +36,32 @@ public final class ScanManager extends WebSocketListener implements IScanManager
 
     private final PluginManager i_pluginManager;
 
+    private final PluginConfig i_pluginConfig;
+
     private final List<Scan> m_scans = new ArrayList<>();
 
     private final Set<String> m_subscriptions = new HashSet<>();
 
     private WebSocket m_webSocket;
 
+    private boolean m_connected;
+
     @Override
     public void connect() {
+        if (i_pluginConfig.getApiKey().isEmpty()) {
+            return;
+        }
+
         Request request = new Request.Builder()
                 .url("wss://ws.paladin.ac")
                 .build();
 
         i_httpClient.newWebSocket(request, this);
+    }
+
+    @Override
+    public boolean isConnected() {
+        return m_connected;
     }
 
     @Override
@@ -125,6 +139,7 @@ public final class ScanManager extends WebSocketListener implements IScanManager
     @Override
     public void onOpen(WebSocket webSocket, okhttp3.Response response) {
         this.m_webSocket = webSocket;
+        m_connected = true;
 
         for (String subscription : m_subscriptions) {
             subscribe(subscription);
@@ -172,11 +187,12 @@ public final class ScanManager extends WebSocketListener implements IScanManager
 
     @Override
     public void onClosed(WebSocket webSocket, int code, String reason) {
-        connect();
+        m_connected = false;
     }
 
     @Override
     public void onFailure(WebSocket webSocket, Throwable t, okhttp3.Response response) {
-        t.printStackTrace();
+        m_connected = false;
+        connect();
     }
 }
